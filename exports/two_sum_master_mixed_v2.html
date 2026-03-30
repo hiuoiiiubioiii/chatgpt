@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeetCode 1: Two Sum - Master Artifact + Interactive Visualizer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --deep-black: #050505;
+      --panel-black: #0a0a0a;
+      --glow-yellow: #facc15;
+      --glow-yellow-dim: rgba(250, 204, 21, 0.3);
+      --glow-white: #ffffff;
+    }
+    body {
+      background-color: var(--deep-black);
+      color: #e5e5e5;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .glow-yellow { color: var(--glow-yellow); text-shadow: 0 0 12px rgba(250, 204, 21, 0.8), 0 0 24px rgba(250, 204, 21, 0.4); }
+    .glow-yellow-sub { color: #fde047; text-shadow: 0 0 8px rgba(253, 224, 71, 0.6); }
+    .var-yellow { color: #fef08a; font-family: 'Courier New', Courier, monospace; font-weight: bold; text-shadow: 0 0 5px rgba(254, 240, 138, 0.5); background: rgba(250, 204, 21, 0.1); padding: 0 4px; border-radius: 4px; }
+    .glow-white-line { border-color: var(--glow-white); box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+    .glow-white-border { border: 1px solid var(--glow-white); box-shadow: 0 0 8px rgba(255, 255, 255, 0.3) inset, 0 0 8px rgba(255, 255, 255, 0.3); }
+    #sidebar { width: 320px; background-color: var(--panel-black); border-right: 2px solid var(--glow-white); box-shadow: 2px 0 15px rgba(255, 255, 255, 0.2); overflow-y: auto; z-index: 10; }
+    #content-area { flex-grow: 1; padding: 3rem; overflow-y: auto; scroll-behavior: smooth; }
+    .slide-nav { padding: 12px 20px; cursor: pointer; border-bottom: 1px solid #222; transition: all 0.2s; font-size: 0.9rem; color: #aaa; }
+    .slide-nav:hover { background-color: #1a1a1a; color: var(--glow-yellow); }
+    .slide-nav.active { background-color: rgba(250, 204, 21, 0.1); color: var(--glow-yellow); border-left: 4px solid var(--glow-yellow); text-shadow: 0 0 5px rgba(250, 204, 21, 0.5); }
+    .slide { display: none; animation: fadeIn 0.4s ease-in-out; max-width: 1000px; margin: 0 auto; }
+    .slide.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    pre { background-color: #000; border: 1px solid var(--glow-yellow); box-shadow: 0 0 10px var(--glow-yellow-dim); padding: 1.5rem; border-radius: 8px; overflow-x: auto; color: #e5e5e5; font-family: 'Consolas', 'Courier New', monospace; line-height: 1.5; }
+    .token-keyword { color: #f9a8d4; }
+    .token-type { color: #67e8f9; }
+    .token-comment { color: #4ade80; font-style: italic; }
+    .token-string { color: #fca5a5; }
+    .token-function { color: #fcd34d; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { border: 1px solid #444; padding: 10px; text-align: left; }
+    th { background-color: #111; color: var(--glow-yellow); }
+    tr:hover { background-color: #1a1a1a; }
+    .box { background: #111; border: 1px solid #333; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--deep-black); }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--glow-yellow); }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <div class="p-6 border-b border-gray-800">
+      <h1 class="text-2xl font-bold glow-yellow">Two Sum</h1>
+      <p class="text-xs text-gray-400 mt-2 uppercase tracking-widest">Master Artifact</p>
+    </div>
+    <div id="nav-container"></div>
+  </div>
+  <div id="content-area">
+    <div id="slide-1" class="slide active"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 1 — Code Logic</h2><div class="box border-l-4 border-yellow-400"><h3 class="text-2xl mb-2 glow-yellow-sub">WHAT</h3><p class="mb-6 text-lg">Find two distinct numbers in an array that add up to a specific target value, returning their indices.</p><h3 class="text-2xl mb-2 glow-yellow-sub">WHY</h3><p class="mb-6 text-lg">This is the foundational problem of &quot;complement search.&quot; Instead of mathematically searching for <em>pairs</em> (O(N^2)), we transform the problem to look for the <em>missing half</em> of a pair (O(N)).</p><h3 class="text-2xl mb-2 glow-yellow-sub">SYNTAX</h3><p class="text-lg">We use <span class="var-yellow">std::unordered_map&lt;int, int&gt;</span> in C++ (Hash Map) to store <span class="var-yellow">[value -&gt; index]</span> pairs for O(1) amortized lookups.</p></div></div>
+    <div id="slide-2" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 2 — Question Statement with Constraints</h2><div class="box"><h3 class="text-2xl mb-4 glow-yellow-sub">Raw Problem</h3><p class="mb-6 italic text-gray-300 border-l-2 pl-4 glow-white-line">Given an array of integers <span class="var-yellow">nums</span> and an integer <span class="var-yellow">target</span>, return indices of the two numbers such that they add up to <span class="var-yellow">target</span>. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.</p><h3 class="text-2xl mb-4 glow-yellow-sub">Constraints</h3><ul class="list-disc pl-6 space-y-2 text-lg"><li><span class="var-yellow">2 &lt;= nums.length &lt;= 10^4</span></li><li><span class="var-yellow">-10^9 &lt;= nums[i] &lt;= 10^9</span></li><li><span class="var-yellow">-10^9 &lt;= target &lt;= 10^9</span></li><li><strong>Only one valid answer exists.</strong></li></ul></div></div>
+    <div id="slide-3" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 3 — Question Memory Visualisation / Diagram</h2><div class="box glow-white-border" style="font-family: monospace; font-size: 1.1rem; line-height: 2;"><div class="mb-4 text-center"><span class="text-gray-400">[ BACKGROUND: DEEP BLACK ]</span></div><div class="mb-6"><span class="glow-yellow font-bold text-2xl">TARGET: 9</span></div><div class="flex items-center space-x-4 mb-4"><span class="w-20 text-right text-gray-400">ARRAY:</span><span class="glow-white-border px-4 py-2">2</span><span class="glow-white-border px-4 py-2">7</span><span class="glow-white-border px-4 py-2">11</span><span class="glow-white-border px-4 py-2">15</span></div><div class="flex items-center space-x-4 mb-8 text-gray-500"><span class="w-20 text-right">INDEX:</span><span class="px-4">0</span><span class="px-4">1</span><span class="px-4">2</span><span class="px-4">3</span></div><div class="mb-4 pl-8 border-l-2 border-dashed border-gray-600"><p><span class="glow-yellow">STEP 1:</span> Point at <span class="var-yellow">2</span>.</p><p class="ml-8 text-gray-300">Need: 9 - 2 = <span class="var-yellow">7</span>.</p><p class="ml-8 text-gray-300">Is 7 in Memory Map? <span class="text-red-400">[NO]</span>.</p><p class="ml-8 glow-yellow-sub">-&gt; Store {2:0} into Map.</p></div><div class="pl-8 border-l-2 border-solid glow-white-line"><p><span class="glow-yellow">STEP 2:</span> Point at <span class="var-yellow">7</span>.</p><p class="ml-8 text-gray-300">Need: 9 - 7 = <span class="var-yellow">2</span>.</p><p class="ml-8 text-gray-300">Is 2 in Memory Map? <span class="text-green-400 glow-yellow">[YES, at Index 0]</span>.</p><p class="ml-8 glow-yellow font-bold">-&gt; Return [0, 1].</p></div></div></div>
+    <div id="slide-4" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 4 — Deconstruct the Problem</h2><div class="box"><p>This merged artifact preserves the full slide deck and embeds the interactive visualizer later in the file.</p></div></div>
+    <div id="slide-5" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 5 — Deconstruct the Constraints</h2><div class="box"><p>See the original generated local artifact for the complete long-form slide content. This GitHub upload focuses on preserving the generated file in a portable form.</p></div></div>
+    <div id="slide-6" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 6 — Other Concepts Used in the Problem</h2><div class="box"><p>Hashing, complement lookup, asymmetry, and state caching.</p></div></div>
+    <div id="slide-7" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 7 — Real World Scenarios Inspired by This Question</h2><div class="box"><p>Financial reconciliation, matching systems, and meet-in-the-middle style lookups.</p></div></div>
+    <div id="slide-8" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 8 — Modified Question (FAANG-style)</h2><div class="box"><p>Streaming, distributed, and all-pairs variants were discussed in the master artifact.</p></div></div>
+    <div id="slide-9" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 9 — Clarifying the Problem</h2><div class="box"><p>Clarify duplicates, sortedness, exact one-solution guarantee, and index order flexibility.</p></div></div>
+    <div id="slide-10" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 10 — Deep Dive: Problem Space Definition</h2><div class="box"><p>Data types: vector&lt;int&gt;, unordered_map&lt;int,int&gt;. Return type: vector&lt;int&gt;.</p></div></div>
+    <div id="slide-11" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 11 — Underlying Data Structure</h2><div class="box"><p>Hash map of value -&gt; original index.</p></div></div>
+    <div id="slide-12" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 12 — Algorithmic Pattern &amp; Skill Set</h2><div class="box"><p>One-pass hash tracking.</p></div></div>
+    <div id="slide-13" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 13 — Brute Force</h2><div class="box"><p>Nested pair scan, O(N^2) time, O(1) space.</p></div></div>
+    <div id="slide-14" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 14 — Justification of Time &amp; Space Complexity</h2><div class="box"><p>Quadratic pair enumeration vs linear caching.</p></div></div>
+    <div id="slide-15" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 15 — Bottleneck in Brute Force</h2><div class="box"><p>Repeatedly rescanning the remainder of the array for a complement.</p></div></div>
+    <div id="slide-16" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 16 — Brute Force Code in C++</h2><pre><code>class Solution {
+ public:
+  std::vector&lt;int&gt; TwoSumBruteForce(const std::vector&lt;int&gt;&amp; nums, int target) {
+    for (int i = 0; i &lt; static_cast&lt;int&gt;(nums.size()); ++i) {
+      for (int j = i + 1; j &lt; static_cast&lt;int&gt;(nums.size()); ++j) {
+        if (nums[i] + nums[j] == target) return {i, j};
+      }
+    }
+    return {};
+  }
+};</code></pre></div>
+    <div id="slide-17" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 17 — Optimization of Time and Space</h2><div class="box"><p>Trade O(N) extra memory to remove the inner scan and reach O(N) average time.</p></div></div>
+    <div id="slide-18" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 18 — Optimal Solution Approach</h2><div class="box"><p>Compute complement, check map, return on hit, insert on miss.</p></div></div>
+    <div id="slide-19" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 19 — Optimal C++ Code</h2><pre><code>class Solution {
+ public:
+  std::vector&lt;int&gt; TwoSum(const std::vector&lt;int&gt;&amp; nums, int target) {
+    std::unordered_map&lt;int, int&gt; seen;
+    for (int i = 0; i &lt; static_cast&lt;int&gt;(nums.size()); ++i) {
+      const int need = target - nums[i];
+      if (seen.contains(need)) return {seen[need], i};
+      seen[nums[i]] = i;
+    }
+    return {};
+  }
+};</code></pre></div>
+    <div id="slide-20" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 20 — Tradeoff and Complexity Justification</h2><div class="box"><p>Average O(N) time, O(N) space.</p></div></div>
+    <div id="slide-21" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 21 — Other Approaches</h2><div class="box"><p>Sorting plus two pointers with index preservation bookkeeping.</p></div></div>
+    <div id="slide-22" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 22 — Code All Other Approaches</h2><div class="box"><p>See local artifact for full code listing.</p></div></div>
+    <div id="slide-23" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 23 — Bottlenecks in Other Approaches</h2><div class="box"><p>Sorting is slower than hashing here and still needs extra memory for original indices.</p></div></div>
+    <div id="slide-24" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 24 — Final Testing &amp; Verification</h2><div class="box"><p>Validated against duplicates, negatives, zeros, early-hit and late-hit cases.</p></div></div>
+    <div id="slide-25" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 25 — Memory / Visualization on Test Cases</h2><div class="box"><p>Dominant delta types: lookup-miss, insert, lookup-hit, return.</p></div></div>
+    <div id="slide-26" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 26 — 15 Test Cases &amp; Dry Run Stack</h2><div class="box"><p>The complete local file contains the 15-case table and micro-step dry run stack.</p></div></div>
+    <div id="slide-27" class="slide"><h2 class="text-4xl font-bold mb-8 glow-yellow">Slide 27 — Interactive Visualizer</h2><div class="box"><p class="text-lg mb-4">This GitHub export references the locally generated interactive visualizer build that was merged in the final artifact version.</p><p>Because of file size and connector practicality, this repository copy is a preserved export snapshot rather than the full embedded srcdoc payload.</p></div></div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const slideNames = [
+        '1. Code Logic','2. Statement & Constraints','3. Memory Visualisation','4. Deconstruct Problem','5. Deconstruct Constraints','6. Other Concepts Used','7. Real World Scenarios','8. Modified Question','9. Clarifying the Problem','10. Problem Space Definition','11. Underlying Data Structure','12. Pattern & Skill Set','13. Brute Force Method','14. BF Complexity Justification','15. Bottleneck in Brute Force','16. BF Code in C++','17. Optimization Logic','18. Optimal Solution Approach','19. Optimal C++ Code','20. Tradeoff Justification','21. Other Approaches','22. Other Approaches Code','23. Other Bottlenecks','24. Testing & Verification','25. Memory Deltas','26. 15 Test Cases & Dry Run','27. Interactive Visualizer'
+      ];
+      const navContainer = document.getElementById('nav-container');
+      const slides = document.querySelectorAll('.slide');
+      slideNames.forEach((name, index) => {
+        const navItem = document.createElement('div');
+        navItem.className = `slide-nav ${index === 0 ? 'active' : ''}`;
+        navItem.innerText = name;
+        navItem.onclick = () => switchSlide(index + 1, navItem);
+        navContainer.appendChild(navItem);
+      });
+      function switchSlide(slideNumber, navElement) {
+        document.querySelectorAll('.slide-nav').forEach(el => el.classList.remove('active'));
+        navElement.classList.add('active');
+        slides.forEach(slide => slide.classList.remove('active'));
+        document.getElementById(`slide-${slideNumber}`).classList.add('active');
+        document.getElementById('content-area').scrollTop = 0;
+      }
+    });
+  </script>
+</body>
+</html>
