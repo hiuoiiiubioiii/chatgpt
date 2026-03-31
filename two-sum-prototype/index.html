@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Two Sum Prototype Engine</title>
+  <style>
+    :root {
+      --bg: #050505;
+      --panel: #111111;
+      --panel-2: #171717;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --yellow: #facc15;
+      --green: #4ade80;
+      --red: #f87171;
+      --blue: #60a5fa;
+      --border: #2f2f2f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 Arial, Helvetica, sans-serif;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1, h2, h3 { color: var(--yellow); }
+    h1 { margin-top: 0; text-shadow: 0 0 14px rgba(250, 204, 21, 0.35); }
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.02) inset;
+    }
+    .accent { color: var(--yellow); font-weight: 700; }
+    .muted { color: var(--muted); }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    pre {
+      background: #000;
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { color: var(--yellow); background: var(--panel-2); }
+    .pill {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #444;
+      background: var(--panel-2);
+      color: var(--muted);
+      margin-right: 8px;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .io {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    .path {
+      border-left: 3px solid var(--yellow);
+      padding-left: 12px;
+      margin: 8px 0;
+    }
+    .hit { color: var(--green); font-weight: 700; }
+    .miss { color: var(--red); font-weight: 700; }
+    .small { font-size: 14px; }
+    .footer { margin-top: 24px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>LeetCode Q1 Prototype Engine — Two Sum</h1>
+    <div class="card">
+      <div class="pill">Input-output mapping</div>
+      <div class="pill">Representation stack</div>
+      <div class="pill">Logical view mapping</div>
+      <div class="pill">Invariant</div>
+      <div class="pill">Trace engine</div>
+      <div class="pill">15-case replay</div>
+      <p class="muted">A compact static prototype that packages the core concepts studied for Q1 into a reusable analysis engine.</p>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:16px;">
+      <section class="card">
+        <h2>Problem identity</h2>
+        <p><span class="accent">Input:</span> <code>nums</code>, <code>target</code></p>
+        <p><span class="accent">Output:</span> indices <code>[i, j]</code> such that <code>nums[i] + nums[j] = target</code> and <code>i != j</code>.</p>
+        <div class="path small">
+          value relation → position output<br/>
+          pair search → complement lookup
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Representation stack</h2>
+        <table>
+          <tr><th>Layer</th><th>Meaning</th></tr>
+          <tr><td>Surface</td><td>Find two numbers summing to target</td></tr>
+          <tr><td>Structural</td><td>Pair-relation problem</td></tr>
+          <tr><td>Mapped</td><td>Complement lookup problem</td></tr>
+          <tr><td>Memory</td><td><code>value -&gt; index</code> hash map</td></tr>
+          <tr><td>Output</td><td>Pair of original indices</td></tr>
+        </table>
+      </section>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:16px;">
+      <section class="card">
+        <h2>Input-output mapping</h2>
+        <div class="io">
+          <div>
+            <h3>Raw input</h3>
+            <pre>nums   = [x0, x1, x2, ..., xn-1]
+target = T</pre>
+          </div>
+          <div>
+            <h3>Raw output</h3>
+            <pre>[i, j]
+nums[i] + nums[j] = T</pre>
+          </div>
+        </div>
+        <pre>current_value = nums[i]
+needed_value  = target - current_value
+if needed_value exists in seen map:
+    return [seen[needed_value], i]
+else:
+    seen[current_value] = i</pre>
+      </section>
+
+      <section class="card">
+        <h2>Invariant</h2>
+        <p>Before processing index <code>i</code>, the map contains all values from indices <code>[0 .. i-1]</code> mapped to valid earlier indices.</p>
+        <pre>processed prefix | current | unprocessed suffix</pre>
+        <p class="small">This invariant makes the first hit immediately correct.</p>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Google-style C++ reference</h2>
+      <pre>#include &lt;unordered_map&gt;
+#include &lt;vector&gt;
+
+class Solution {
+ public:
+  std::vector&lt;int&gt; twoSum(const std::vector&lt;int&gt;&amp; nums, int target) {
+    std::unordered_map&lt;int, int&gt; seen_index_by_value;
+
+    for (int i = 0; i &lt; static_cast&lt;int&gt;(nums.size()); ++i) {
+      const int current_value = nums[i];
+      const int needed_value = target - current_value;
+
+      const auto it = seen_index_by_value.find(needed_value);
+      if (it != seen_index_by_value.end()) {
+        return {it-&gt;second, i};
+      }
+
+      seen_index_by_value[current_value] = i;
+    }
+
+    return {};
+  }
+};</pre>
+      <p class="small muted">The brute-force baseline and source file are included in <code>src/two_sum_google_style.cpp</code>.</p>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Runtime and measurement model</h2>
+      <table>
+        <tr><th>Metric</th><th>Q1 meaning</th></tr>
+        <tr><td>Unit</td><td>One array element</td></tr>
+        <tr><td>Step</td><td>One loop iteration</td></tr>
+        <tr><td>Runtime stack</td><td>Flat, single main frame</td></tr>
+        <tr><td>Memory growth</td><td>Hash map grows with processed prefix</td></tr>
+        <tr><td>Time</td><td>O(n) average</td></tr>
+        <tr><td>Space</td><td>O(n)</td></tr>
+      </table>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>15-case replay table</h2>
+      <table id="cases-table">
+        <tr>
+          <th>#</th>
+          <th>Label</th>
+          <th>Input</th>
+          <th>Target</th>
+          <th>Expected</th>
+          <th>Mapping summary</th>
+        </tr>
+      </table>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Trace engine schema</h2>
+      <pre>| Step | i | Current Value | Needed Value | Map Before | Lookup | Map After | Output |</pre>
+      <pre>| Micro-Step | Action | Effect |
+| 1 | enter function | create frame |
+| 2 | create map | seen = {} |
+| 3 | begin loop | i = 0 |
+| 4 | read current value | current_value = nums[i] |
+| 5 | compute complement | needed_value = target - current_value |
+| 6 | lookup map | hit or miss |
+| 7 | insert or return | update state or finish |</pre>
+    </section>
+
+    <p class="footer">Repo folder: <code>two-sum-prototype/</code></p>
+  </div>
+
+  <script>
+    const cases = [
+      {id:1,label:'Standard classic case',nums:[2,7,11,15],target:9,expected:[0,1],summary:'2 needs 7 → miss; 7 needs 2 → hit at 0'},
+      {id:2,label:'Duplicate pair',nums:[3,3],target:6,expected:[0,1],summary:'first 3 misses; second 3 hits first 3'},
+      {id:3,label:'Middle pair',nums:[3,2,4],target:6,expected:[1,2],summary:'3 misses; 2 misses; 4 hits 2 at 1'},
+      {id:4,label:'All negatives',nums:[-1,-2,-3,-4,-5],target:-8,expected:[2,4],summary:'-5 hits earlier -3 at index 2'},
+      {id:5,label:'Zero target with duplicate zero',nums:[0,4,3,0],target:0,expected:[0,3],summary:'first 0 stored; second 0 hits first 0'},
+      {id:6,label:'Mixed signs',nums:[-10,7,19,15],target:9,expected:[0,2],summary:'19 hits earlier -10'},
+      {id:7,label:'Large boundary values',nums:[1000000000,500000000,500000000],target:1000000000,expected:[1,2],summary:'second 500000000 hits first one'},
+      {id:8,label:'Valid pair at the end',nums:[15,11,7,2],target:9,expected:[2,3],summary:'2 hits earlier 7'},
+      {id:9,label:'First and last elements pair',nums:[2,3,4,1,7],target:9,expected:[0,4],summary:'7 hits earlier 2'},
+      {id:10,label:'Sparse wide gap values',nums:[-99999,3,5,99999],target:0,expected:[0,3],summary:'99999 hits earlier -99999'},
+      {id:11,label:'Early immediate hit',nums:[4,5,1,8],target:9,expected:[0,1],summary:'5 immediately hits earlier 4'},
+      {id:12,label:'Later pair after noise',nums:[1,3,5,6],target:9,expected:[1,3],summary:'6 hits earlier 3'},
+      {id:13,label:'Dense duplicates before hit',nums:[1,1,1,1,4,5,1,1],target:9,expected:[4,5],summary:'5 hits earlier 4'},
+      {id:14,label:'Minimum allowed length',nums:[5,4],target:9,expected:[0,1],summary:'4 hits earlier 5'},
+      {id:15,label:'Double zero minimum case',nums:[0,0],target:0,expected:[0,1],summary:'second 0 hits first 0'}
+    ];
+
+    const table = document.getElementById('cases-table');
+    for (const testCase of cases) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${testCase.id}</td>
+        <td>${testCase.label}</td>
+        <td><code>[${testCase.nums.join(', ')}]</code></td>
+        <td><code>${testCase.target}</code></td>
+        <td><code>[${testCase.expected.join(', ')}]</code></td>
+        <td>${testCase.summary}</td>
+      `;
+      table.appendChild(row);
+    }
+  </script>
+</body>
+</html>
