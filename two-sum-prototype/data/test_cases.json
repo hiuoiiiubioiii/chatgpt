@@ -1,0 +1,17 @@
+[
+  {"id":1,"label":"Standard classic case","nums":[2,7,11,15],"target":9,"expected":[0,1]},
+  {"id":2,"label":"Duplicate pair","nums":[3,3],"target":6,"expected":[0,1]},
+  {"id":3,"label":"Middle pair","nums":[3,2,4],"target":6,"expected":[1,2]},
+  {"id":4,"label":"All negatives","nums":[-1,-2,-3,-4,-5],"target":-8,"expected":[2,4]},
+  {"id":5,"label":"Zero target with duplicate zero","nums":[0,4,3,0],"target":0,"expected":[0,3]},
+  {"id":6,"label":"Mixed signs","nums":[-10,7,19,15],"target":9,"expected":[0,2]},
+  {"id":7,"label":"Large boundary values","nums":[1000000000,500000000,500000000],"target":1000000000,"expected":[1,2]},
+  {"id":8,"label":"Valid pair at the end","nums":[15,11,7,2],"target":9,"expected":[2,3]},
+  {"id":9,"label":"First and last elements pair","nums":[2,3,4,1,7],"target":9,"expected":[0,4]},
+  {"id":10,"label":"Sparse wide gap values","nums":[-99999,3,5,99999],"target":0,"expected":[0,3]},
+  {"id":11,"label":"Early immediate hit","nums":[4,5,1,8],"target":9,"expected":[0,1]},
+  {"id":12,"label":"Later pair after noise","nums":[1,3,5,6],"target":9,"expected":[1,3]},
+  {"id":13,"label":"Dense duplicates before hit","nums":[1,1,1,1,4,5,1,1],"target":9,"expected":[4,5]},
+  {"id":14,"label":"Minimum allowed length","nums":[5,4],"target":9,"expected":[0,1]},
+  {"id":15,"label":"Double zero minimum case","nums":[0,0],"target":0,"expected":[0,1]}
+]
